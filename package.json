@@ -1,0 +1,19 @@
+{
+  "name": "@mdevrani/my-js-lib",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "keywords": ["math", "utils", "library"],
+  "author": "Mayank",
+  "license": "MIT",
+  "description": "A tiny math utility library",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "rollup": "^4.39.0"
+  }
+
+}
