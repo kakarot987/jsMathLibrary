@@ -1,0 +1,33 @@
+name: Library verification
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Build library
+        run: npm run build
+      - name: Inspect npm package
+        run: npm pack --dry-run
+      - name: Smoke-test packaged ESM and CommonJS from a separate consumer
+        shell: bash
+        run: |
+          tarball="$(npm pack --pack-destination "$RUNNER_TEMP" --silent)"
+          mkdir -p "$RUNNER_TEMP/math-consumer"
+          cd "$RUNNER_TEMP/math-consumer"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund "$RUNNER_TEMP/$tarball"
+          node --input-type=module -e "import { add, divide } from '@mdevrani/my-js-lib'; if (add(2, 3) !== 5 || divide(9, 3) !== 3) process.exit(1)"
+          node -e "const { subtract, multiply } = require('@mdevrani/my-js-lib'); if (subtract(9, 4) !== 5 || multiply(3, 4) !== 12) process.exit(1)"
